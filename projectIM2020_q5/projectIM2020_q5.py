@@ -17,19 +17,18 @@ def get_DB_images():
 
 def get_footprints():
     images = []
-    for i in range(3):
-        images.append(cv2.imread('00021_%d.png' %(1 + i),0))
+    images.append(cv2.imread('../projectIM2020_q4/00008.jpg' ,0))
 
     return images
 
 def plot_results(small_pic,big_pic):
-    finalImage = np.zeros((big_pic.shape[0],big_pic.shape[1]*2))
+    finalImage = np.zeros((big_pic.shape[0],big_pic.shape[1]+small_pic.shape[1]))
 
-    # print(finalImage.shape)
-    # print(small_pic.shape)
-    # print(big_pic.shape)
+    print(finalImage.shape)
+    print(small_pic.shape)
+    print(big_pic.shape)
     finalImage[0:big_pic.shape[0], 0:big_pic.shape[1]] += big_pic
-    finalImage[0:small_pic.shape[0], big_pic.shape[1]::] += small_pic
+    finalImage[0:small_pic.shape[0], big_pic.shape[1]:big_pic.shape[1]+small_pic.shape[1]] += small_pic
     plt.imshow(finalImage, 'gray')
     # plt.imshow(footprint,'gray')
     plt.show()
@@ -37,7 +36,7 @@ def plot_results(small_pic,big_pic):
 def find_match_footprint(footprint, images):
     img1 = footprint  # queryImage
     maxGreens = 0
-    res = images[0]
+    res = []
     for j in range(len(images)):
         img2 = images[j]  # trainImage
 
@@ -47,6 +46,9 @@ def find_match_footprint(footprint, images):
         # find the keypoints and descriptors with SIFT
         kp1, des1 = sift.detectAndCompute(img1, None)
         kp2, des2 = sift.detectAndCompute(img2, None)
+        pts1 = cv2.KeyPoint.convert(kp1)
+        pts2 = cv2.KeyPoint.convert(kp2)
+
 
         # FLANN parameters
         FLANN_INDEX_KDTREE = 0
@@ -80,11 +82,11 @@ def find_match_footprint(footprint, images):
             maxGreens = cntGreens
             res = img2
 
-        # print('cntGreen    ',cntGreens, 'maxGreens    ', maxGreens)
-        # img3 = cv2.drawMatchesKnn(img1, kp1, img2, kp2, matches, None, **draw_params)
-        # plt.imshow(img3)
-        # plt.title((j))
-        # plt.show()
+        print('cntGreen    ',cntGreens, 'maxGreens    ', maxGreens)
+        img3 = cv2.drawMatchesKnn(img1, kp1, img2, kp2, matches, None, **draw_params)
+        plt.imshow(img3)
+        plt.title((j))
+        plt.show()
 
 
 
